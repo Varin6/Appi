@@ -19,29 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::get('notes', function() {
-    // If the Content-Type and Accept headers are set to 'application/json',
-    // this will return a JSON structure. This will be cleaned up later.
-    return Note::all();
-});
-
-Route::get('notes/{id}', function($id) {
-    return Note::find($id);
-});
-
-Route::post('notes', function(Request $request) {
-    return Note::create($request->all);
-});
-
-Route::put('notes/{id}', function(Request $request, $id) {
-    $article = Note::findOrFail($id);
-    $article->update($request->all());
-
-    return $article;
-});
-
-Route::delete('notes/{id}', function($id) {
-    Note::find($id)->delete();
-
-    return 204;
-});
+Route::get('notes', 'NoteController@index');
+Route::get('notes/{note}', 'NoteController@show');
+Route::post('notes', 'NoteController@store');
+Route::put('notes/{note}', 'NoteController@update');
+Route::delete('notes/{note}', 'NoteController@delete');
