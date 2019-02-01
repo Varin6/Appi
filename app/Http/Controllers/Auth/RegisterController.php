@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\AuthController;
 use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -35,10 +37,31 @@ class RegisterController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(AuthController $authcontroller)
+
     {
+        $this->authcontroller = $authcontroller;
         $this->middleware('guest');
     }
+
+
+    /**
+     * Handle a registration request for the application.
+     *
+     *
+     */
+    public function register()
+    {
+        $this->validator(request(['name', 'email', 'password', 'password_confirmation']))->validate();
+
+        $data = request(['name', 'email', 'password']);
+
+        return $this->create($data);
+
+        //return redirect()->route('login')
+            //->with(['success' => 'Congratulations! your account is registered, you will shortly receive an email to activate your account.']);
+    }
+
 
     /**
      * Get a validator for an incoming registration request.
@@ -58,15 +81,20 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
-     * @return \App\User
+     * @param array $data
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function create(array $data)
+
     {
-        return User::create([
+
+        User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        return $this->authcontroller->login();
+
     }
 }
